@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1.0.0",
+  "parameterSet": "scenario-parameters.artscape.mvp@1.0.0",
+  "currency": "CNY",
+  "rules": {
+    "artistConcentration": "0.400000",
+    "lowLiquidity": "0.300000",
+    "bearLoss": "0.300000",
+    "thresholdComparison": "strictly_greater_than"
+  },
+  "formula": {
+    "horizonYears": 3,
+    "moneyScale": 2,
+    "ratioScale": 6,
+    "roundingMode": "HALF_UP"
+  },
+  "samplePositionsFixture": "src/testing/fixtures.ts#samplePositions",
+  "expected": {
+    "scenarios": [
+      { "code": "bull", "nominalValue": "1000.00", "theoreticalValue": "1538.99", "realizableValue": "1209.66", "gainLoss": "209.66", "returnRate": "0.209660" },
+      { "code": "neutral", "nominalValue": "1000.00", "theoreticalValue": "1275.71", "realizableValue": "1002.60", "gainLoss": "2.60", "returnRate": "0.002600" },
+      { "code": "bear", "nominalValue": "1000.00", "theoreticalValue": "624.07", "realizableValue": "490.20", "gainLoss": "-509.80", "returnRate": "-0.509800" }
+    ],
+    "riskMetrics": {
+      "maxArtistConcentration": "0.600000",
+      "maxArtistName": "艺术家甲",
+      "lowLiquidityRatio": "0.600000",
+      "completenessRatio": "1.000000",
+      "bearLossRate": "0.509800"
+    },
+    "breachCodes": ["artist_concentration", "low_liquidity", "bear_loss"]
+  }
+}

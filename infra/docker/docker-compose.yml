@@ -1,0 +1,90 @@
+services:
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - artscape-mongo:/data/db
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  mongo-init:
+    image: mongo:7
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    restart: "no"
+    command: ["mongosh", "mongodb://mongodb:27017/admin", "--eval", "try { rs.status() } catch (e) { rs.initiate({_id:'rs0',members:[{_id:0,host:'mongodb:27017'}]}) }"]
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - artscape-redis:/data
+  minio:
+    image: minio/minio:RELEASE.2025-07-23T15-54-02Z
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-artscape}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-artscape-local-secret}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - artscape-objects:/data
+  minio-init:
+    image: minio/mc:RELEASE.2025-07-21T05-28-08Z
+    depends_on:
+      - minio
+    restart: "no"
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["until mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD; do sleep 2; done; mc mb --ignore-existing local/artscape"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-artscape}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-artscape-local-secret}
+  artscape-backend:
+    build:
+      context: ../..
+      dockerfile: backend/artscape-node/Dockerfile
+    environment:
+      NODE_ENV: "production"
+      PORT: "3100"
+      MONGODB_URI: "mongodb://mongodb:27017/artscape?replicaSet=rs0"
+      REDIS_URL: "redis://redis:6379"
+      ARTSCAPE_ASYNC_JOBS: "true"
+      S3_BUCKET: "artscape"
+      S3_ENDPOINT: "http://minio:9000"
+      S3_REGION: "us-east-1"
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-artscape}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-artscape-local-secret}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      JWT_ISSUER: ${JWT_ISSUER:-artscape}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-artscape-api}
+      ALLOW_DEV_AUTH_HEADERS: "false"
+      OPENAI_API_KEY: ${OPENAI_API_KEY:?OPENAI_API_KEY is required}
+      OPENAI_MODEL: ${OPENAI_MODEL:-deepseek-chat}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.deepseek.com}
+      AI_PROVIDER_NAME: ${AI_PROVIDER_NAME:-deepseek}
+      ARTSCAPE_PDF_FONT: "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
+      ARTSCAPE_PDF_FONT_FAMILY: "NotoSansCJKsc-Regular"
+      DATA_DIR: "/app/data"
+    ports:
+      - "3100:3100"
+    depends_on:
+      mongo-init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+      minio:
+        condition: service_started
+      minio-init:
+        condition: service_completed_successfully
+    volumes:
+      - artscape-data:/app/data
+volumes:
+  artscape-mongo:
+  artscape-data:
+  artscape-redis:
+  artscape-objects:

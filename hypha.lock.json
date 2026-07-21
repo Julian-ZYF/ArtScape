@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/CodeSoul-co/Hypha.git",
+  "branch": "dev-domain-merge",
+  "commit": "1232120fa7fa30c228a7f792ac3a090e49d92d56",
+  "schemaVersion": "1.0.0",
+  "packageVersions": {
+    "@hypha/core": "0.0.0",
+    "@hypha/domain": "0.0.0",
+    "@hypha/fsm": "0.0.0",
+    "@hypha/harness": "0.0.0",
+    "@hypha/tools": "0.0.0",
+    "@hypha/adapters-local": "0.0.0"
+  },
+  "updatedAt": "2026-07-20T00:00:00.000Z",
+  "note": "Hypha is an ignored external checkout with independent Git history."
+}
+

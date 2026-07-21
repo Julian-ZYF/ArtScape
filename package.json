@@ -1,0 +1,27 @@
+{
+  "name": "artscape",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ArtScape portfolio sandbox Agent backend built on Hypha",
+  "workspaces": [
+    "backend/artscape-node",
+    "frontend/artscape-web"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @artscape/backend",
+    "dev:web": "npm run dev --workspace @artscape/web",
+    "dev:web:docker": "node frontend/artscape-web/scripts/start-with-docker-auth.mjs",
+    "build": "npm run build --workspace @artscape/backend && npm run build --workspace @artscape/web",
+    "build:web": "npm run build --workspace @artscape/web",
+    "typecheck": "npm run typecheck --workspace @artscape/backend && npm run typecheck --workspace @artscape/web",
+    "typecheck:web": "npm run typecheck --workspace @artscape/web",
+    "lint": "npm run lint --workspace @artscape/backend",
+    "test": "npm run test --workspace @artscape/backend",
+    "test:coverage": "npm run test:coverage --workspace @artscape/backend",
+    "check:hypha": "node scripts/check-hypha-version.mjs",
+    "verify": "npm run check:hypha && npm run lint && npm run typecheck && npm run build && npm run test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "port": 3100,
+  "dataDir": "./data",
+  "repository": "file",
+  "mongoUri": "",
+  "openai": {
+    "baseUrl": "https://api.openai.com/v1",
+    "apiKeyEnv": "OPENAI_API_KEY",
+    "modelAlias": "artscape-explanation"
+  }
+}
+

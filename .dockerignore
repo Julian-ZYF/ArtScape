@@ -1,0 +1,14 @@
+.git
+**/.git
+node_modules
+**/node_modules
+**/dist
+coverage
+data
+dev_tmp_docs
+docs
+output
+tmp
+backups
+.env
+.env.*
