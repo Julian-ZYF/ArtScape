@@ -69,7 +69,6 @@ cd ArtScape
 
 ```powershell
 git clone --branch dev-domain-merge https://github.com/CodeSoul-co/Hypha.git Hypha
-git -C Hypha checkout 1232120fa7fa30c228a7f792ac3a090e49d92d56
 ```
 
 校验 Hypha 分支、Commit 和工作区状态：
